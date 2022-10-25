@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useState } from 'react';
-import { destroyCookie } from 'nookies';
+import { destroyCookie, setCookie, parseCookies } from 'nookies';
 import Router from 'next/router';
 import { api } from '../services/apiClient';
 
@@ -12,7 +12,7 @@ type AuthContextData = {
 
 type UserProps = {
     id: string;
-    nome: string;
+    name: string;
     email: string;
 }
 
@@ -43,10 +43,32 @@ export function AuthProvider({ children }: AuthProviderProps){
 
     async function signIn({ email,password }: SignInProps){
         try{
+            const response = await api.post('/session', {
+                email, 
+                password
+            })
+            // console.log(response.data);
+            const { id, name, token } = response.data;
 
+            setCookie(undefined, '@toplanches.token', token, {
+                maxAge: 60 * 60 * 24 * 30,  // Vai espirar em 1 mÊs
+                path: "/" // quais caminhos  terão acesso ao  cookie
+            })
+            setUser({
+                id,
+                name,
+                email,
+            })
+
+            // Passar para proximas requisições o nosso token
+            api.defaults.headers['Authorization'] = `Bearer ${token}`
+
+            // Redirecionar o user para /dashboard
+            Router.push('/dashboard')
+            
         }
-        catch{
-
+        catch(err){
+            console.log("ERRO AO ACESSAR", err);
         }
     }
 
