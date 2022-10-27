@@ -10,6 +10,8 @@ import { Input } from '../pages/components/ui/Input';
 import { Button } from '../pages/components/ui/Button';
 
 import Link from 'next/link';
+import { toast } from 'react-toastify';
+
 
 
 import { AuthContext } from '../contexts/AuthContext';
@@ -29,7 +31,7 @@ export default function Home() {
     event.preventDefault();
 
     if(email ==='' || password === ''){
-      alert("PREENCHA TODOS OS DADOS!!!")
+      toast.warning('Preencha todos os dados!')
       return;
     }
 
