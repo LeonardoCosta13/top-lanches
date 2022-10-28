@@ -33,6 +33,7 @@ export default function SignUp() {
 
     if(name === '' || email === '' || password === ''){
       toast.warning('Preencha todos os dados!')
+    
       
       return;
     }
