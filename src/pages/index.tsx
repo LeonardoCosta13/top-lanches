@@ -14,6 +14,7 @@ import { toast } from 'react-toastify';
 
 import { AuthContext } from '../contexts/AuthContext';
 import { canSSRGuest } from '../utils/canSSRGuest';
+import { GetServerSideProps } from 'next';
 
 export default function Home() {
 
@@ -90,8 +91,8 @@ export default function Home() {
   )
 }
 
-export const getServerSideProps = canSSRGuest( async(contexto) => {
+export const getServerSideProps: GetServerSideProps=  async(contexto) => {
   return {
     props: {}
   }
-})
+}

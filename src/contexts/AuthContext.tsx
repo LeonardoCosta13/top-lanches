@@ -1,8 +1,9 @@
-import { createContext, ReactNode, useState } from 'react';
+import { createContext, ReactNode, useState, useEffect } from 'react';
 import { destroyCookie, setCookie, parseCookies } from 'nookies';
 import Router from 'next/router';
 import { api } from '../services/apiClient';
 import { toast } from 'react-toastify';
+import axios from 'axios';
 
 type AuthContextData = {
     user: UserProps;
@@ -38,7 +39,10 @@ export const AuthContext = createContext({} as AuthContextData)
 export function signOut(){
     try{
         destroyCookie(undefined, '@toplanches.token')
-        Router.push('/')
+        console.log("Erro")
+        // Router.push('/')
+    
+        
     }
     catch{
         console.log('Erro ao deslogar.')
@@ -48,6 +52,26 @@ export function signOut(){
 export function AuthProvider({ children }: AuthProviderProps){
     const [user, setUser] = useState<UserProps>()
     const isAuthenticated = !!user;
+
+    useEffect(() => {
+       const { '@toplanches.token': token } = parseCookies();
+        if(token){
+            axios.get('/me').then( response => {
+            const { id, name, email } = response.data;
+
+            setUser({
+                id,
+                name,
+                email
+                })
+            })
+            .catch(() => {
+                // se deu erro deslogamoso user.
+                signOut();
+            })
+        }
+
+    }, [])
 
     async function signIn({ email,password }: SignInProps){
         try{
