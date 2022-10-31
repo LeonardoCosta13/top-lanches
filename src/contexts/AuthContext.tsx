@@ -39,8 +39,8 @@ export const AuthContext = createContext({} as AuthContextData)
 export function signOut(){
     try{
         destroyCookie(undefined, '@toplanches.token')
-        console.log("Erro")
-        // Router.push('/')
+    
+        Router.push('/')
     
         
     }
