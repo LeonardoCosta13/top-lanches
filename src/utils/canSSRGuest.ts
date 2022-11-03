@@ -1,24 +1,24 @@
-import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult }  from 'next';
-import { parseCookies } from 'nookies';
- 
-// função para paginas que só pode ser acessados por visitantes
 
-export function canSSRGuest<P>(fn: GetServerSideProps<P>){
+import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next'
+import { parseCookies } from 'nookies'
 
-    return async (contexto: GetServerSidePropsContext ): Promise<GetServerSidePropsResult<P>> => {
+//funcao para paginas que só pode ser acessadas por visitantes
+export function canSSRGuest<P>(fn: GetServerSideProps<P>) {
+  return async (ctx: GetServerSidePropsContext): Promise<GetServerSidePropsResult<P>> => {
 
-        const cookies = parseCookies(contexto);
+    const cookies = parseCookies(ctx);
 
-        if(['@toplanches.token']){
-            return{
-                redirect:{
-                    destination: '/dashboard',
-                    permanent: false,
-                }
-            }
+    // Se o cara tentar acessar a pagina porem tendo já um login salvo redirecionamos
+    if(cookies['@toplanches.token']){
+      return {
+        redirect:{
+          destination: '/dashboard',
+          permanent: false,
         }
-
-        // se o cara tentar acessar a pagina tendo ja um login salvo redirecionamos
-        return await fn(contexto);
+      }
     }
+
+    return await fn(ctx);
+  }
+
 }

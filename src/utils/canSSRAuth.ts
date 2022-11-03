@@ -1,40 +1,43 @@
-import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult }  from 'next';
-import { parseCookies, destroyCookie } from 'nookies';
-import { AuthTokenErrors } from '../services/errors/AuthTokenErrors';
 
-// função para paginas que somente users podem ter acesso.
+import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next'
+import { parseCookies, destroyCookie } from 'nookies'
+ import { AuthTokenErrors } from '../services/errors/AuthTokenErrors';
+ //'../services/errors/AuthTokenError'
 
+
+//funcao para paginas que só users logados podem ter acesso.
 export function canSSRAuth<P>(fn: GetServerSideProps<P>){
-    return async (contexto: GetServerSidePropsContext ): Promise<GetServerSidePropsResult<P>> => {
+  return async (ctx: GetServerSidePropsContext): Promise<GetServerSidePropsResult<P>> => {
+    const cookies = parseCookies(ctx);    
 
-        const cookies = parseCookies(contexto);
+    const token = cookies['@toplanches.token'];
 
-        const token = cookies['@toplanches.token'];
-
-        if(!token){
-            return{
-                redirect:{
-                    destination: '/',
-                    permanent: false,
-                }
-            }
+    if(!token){
+      return{
+        redirect:{
+          destination: '/',
+          permanent: false,
         }
-
-        try{
-            return await fn(contexto);
-        }catch(err){
-            if(err instanceof AuthTokenErrors){
-                destroyCookie(contexto, '@toplanches.token');
-
-                return{
-                    redirect:{
-                    permanent: false,
-                    destination: '/',
-                    }
-                }
-            }
-        }
-
+      }
     }
+
+    try{
+      return await fn(ctx);
+    }catch(err){
+      if(err instanceof AuthTokenErrors ){
+        destroyCookie(ctx, '@toplanches.token');
+
+        return{
+          redirect:{
+            destination: '/',
+            permanent: false
+          }
+        }
+
+      }
+    }
+
+
+  }
 
 }
